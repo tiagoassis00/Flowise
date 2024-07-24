@@ -261,18 +261,31 @@ class PostgresRecordManager implements RecordManagerInterface {
         await this.queryRunner.manager.query(query, recordsToUpsert.flat())
     }
 
+    private validateKeys(keys: string[]): boolean {
+        return keys.every((key) => {
+            const semicolonIndex = key.indexOf(';')
+            return key.trim() !== '' && semicolonIndex === -1
+        })
+    }
+
     async exists(keys: string[]): Promise<boolean[]> {
         if (keys.length === 0) {
             return []
         }
 
+        if (!this.validateKeys(keys)) {
+            throw new Error('Invalid keys parameter: keys=[' + keys.join(',') + ']')
+        }
+
         const startIndex = 2
         const arrayPlaceholders = keys.map((_, i) => `$${i + startIndex}`).join(', ')
-
+        const safeTableName = `"${this.tableName.replace(/"/g, '""')}"`
         const query = `
-        SELECT k, (key is not null) ex from unnest(ARRAY[${arrayPlaceholders}]) k left join "${this.tableName}" on k=key and namespace = $1;
+            SELECT k, (key IS NOT NULL) AS ex
+            FROM unnest(ARRAY[${arrayPlaceholders}]) AS k
+            LEFT JOIN ${safeTableName} ON k = key AND namespace = $1;
         `
-        const res = await this.queryRunner.manager.query(query, [this.namespace, ...keys.flat()])
+        const res = await this.queryRunner.manager.query(query, [this.namespace, ...keys])
         return res.map((row: { ex: boolean }) => row.ex)
     }
 
