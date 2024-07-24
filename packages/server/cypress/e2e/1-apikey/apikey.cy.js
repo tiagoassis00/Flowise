@@ -28,12 +28,15 @@ describe('E2E suite for api/v1/apikey API endpoint', () => {
 
     // UPDATE
     it('can update new api key', () => {
-        const UpdatedApiKeyItem = 'UpsertCloudKey'
-        cy.get('table.MuiTable-root tbody tr').last().find('td').eq(4).find('button').click()
-        cy.get('#keyName').clear().type(`${UpdatedApiKeyItem}`)
-        cy.get('#btn_confirmEditingApiKey').click()
-        cy.get('table.MuiTable-root tbody tr').should('have.length', 2)
-        cy.get('table.MuiTable-root tbody tr').last().find('td').first().should('have.text', UpdatedApiKeyItem)
+        //const UpdatedApiKeyItem = 'UpsertCloudKey'
+        cy.fixture('config.json').then((config) => {
+            const UpdatedApiKeyItem = config.UpdatedApiKeyItem
+            cy.get('table.MuiTable-root tbody tr').last().find('td').eq(4).find('button').click()
+            cy.get('#keyName').clear().type(`${UpdatedApiKeyItem}`)
+            cy.get('#btn_confirmEditingApiKey').click()
+            cy.get('table.MuiTable-root tbody tr').should('have.length', 2)
+            cy.get('table.MuiTable-root tbody tr').last().find('td').first().should('have.text', UpdatedApiKeyItem)
+        })
     })
 
     // DELETE
