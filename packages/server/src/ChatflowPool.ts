@@ -1,6 +1,6 @@
 import { ICommonObject } from 'flowise-components'
 import { IActiveChatflows, INodeData, IReactFlowNode } from './Interface'
-import logger from './utils/logger'
+import logger, { sanitizeInput } from './utils/logger'
 
 /**
  * This pool is to keep track of active chatflow pools
@@ -23,7 +23,8 @@ export class ChatflowPool {
             inSync: true
         }
         if (overrideConfig) this.activeChatflows[chatflowid].overrideConfig = overrideConfig
-        logger.info(`[server]: Chatflow ${chatflowid} added into ChatflowPool`)
+        const logMessage = `[server]: Chatflow ${chatflowid} added into ChatflowPool`
+        logger.info(sanitizeInput(logMessage))
     }
 
     /**
@@ -45,7 +46,8 @@ export class ChatflowPool {
     async remove(chatflowid: string) {
         if (Object.prototype.hasOwnProperty.call(this.activeChatflows, chatflowid)) {
             delete this.activeChatflows[chatflowid]
-            logger.info(`[server]: Chatflow ${chatflowid} removed from ChatflowPool`)
+            const logMessage = `[server]: Chatflow ${chatflowid} removed from ChatflowPool`
+            logger.info(sanitizeInput(logMessage))
         }
     }
 }

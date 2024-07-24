@@ -3,6 +3,7 @@ import { VectorStore } from '@langchain/core/vectorstores'
 import { Document } from '@langchain/core/documents'
 import { PromptTemplate } from '@langchain/core/prompts'
 import { LLMChain } from 'langchain/chains'
+import { sanitizeInput } from '../../../src'
 
 class TaskCreationChain extends LLMChain {
     constructor(prompt: PromptTemplate, llm: BaseChatModel) {
@@ -180,14 +181,14 @@ export class BabyAGI {
         // eslint-disable-next-line no-console
         console.log('\x1b[95m\x1b[1m\n*****TASK LIST*****\n\x1b[0m\x1b[0m')
         // eslint-disable-next-line no-console
-        this.taskList.forEach((t) => console.log(`${t.task_id}: ${t.task_name}`))
+        this.taskList.forEach((t) => console.log(sanitizeInput(`${t.task_id}: ${t.task_name}`)))
     }
 
     printNextTask(task: Task) {
         // eslint-disable-next-line no-console
         console.log('\x1b[92m\x1b[1m\n*****NEXT TASK*****\n\x1b[0m\x1b[0m')
         // eslint-disable-next-line no-console
-        console.log(`${task.task_id}: ${task.task_name}`)
+        console.log(sanitizeInput(`${task.task_id}: ${task.task_name}`))
     }
 
     printTaskResult(result: string) {

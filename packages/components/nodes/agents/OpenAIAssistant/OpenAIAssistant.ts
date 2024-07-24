@@ -1,7 +1,7 @@
 import { ICommonObject, IDatabaseEntity, INode, INodeData, INodeOptionsValue, INodeParams, IUsedTool } from '../../../src/Interface'
 import OpenAI from 'openai'
 import { DataSource } from 'typeorm'
-import { getCredentialData, getCredentialParam } from '../../../src/utils'
+import { getCredentialData, getCredentialParam, sanitizeInput } from '../../../src/utils'
 import fetch from 'node-fetch'
 import { flatten, uniqWith, isEqual } from 'lodash'
 import { zodToJsonSchema } from 'zod-to-json-schema'
@@ -120,7 +120,7 @@ class OpenAIAssistant_Agents implements INode {
                 chatId
             })
             if (!chatmsg) {
-                options.logger.error(`Chat Message with Chat Id: ${chatId} not found`)
+                options.logger.error(sanitizeInput(`Chat Message with Chat Id: ${chatId} not found`))
                 return
             }
             sessionId = chatmsg.sessionId
@@ -136,10 +136,10 @@ class OpenAIAssistant_Agents implements INode {
         }
 
         const openai = new OpenAI({ apiKey: openAIApiKey })
-        options.logger.info(`Clearing OpenAI Thread ${sessionId}`)
+        options.logger.info(sanitizeInput(`Clearing OpenAI Thread ${sessionId}`))
         try {
             if (sessionId) await openai.beta.threads.del(sessionId)
-            options.logger.info(`Successfully cleared OpenAI Thread ${sessionId}`)
+            options.logger.info(sanitizeInput(`Successfully cleared OpenAI Thread ${sessionId}`))
         } catch (e) {
             throw new Error(e)
         }

@@ -4,7 +4,7 @@ import { Dirent } from 'fs'
 import { getNodeModulesPackagePath } from './utils'
 import { promises } from 'fs'
 import { ICommonObject } from 'flowise-components'
-import logger from './utils/logger'
+import logger, { sanitizeInput } from './utils/logger'
 
 export class NodesPool {
     componentNodes: IComponentNodes = {}
@@ -62,7 +62,7 @@ export class NodesPool {
                             }
                         }
                     } catch (err) {
-                        logger.error(`❌ [server]: Error during initDatabase with file ${file}:`, err)
+                        logger.error(sanitizeInput(`❌ [server]: Error during initDatabase with file ${file}:`), err)
                     }
                 }
             })

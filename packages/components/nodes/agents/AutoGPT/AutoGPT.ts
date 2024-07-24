@@ -9,6 +9,7 @@ import { LLMChain } from 'langchain/chains'
 import { INode, INodeData, INodeParams } from '../../../src/Interface'
 import { checkInputs, Moderation } from '../../moderation/Moderation'
 import { formatResponse } from '../../outputparsers/OutputParserHelpers'
+import { sanitizeInput } from '../../../src/utils'
 
 type ObjectTool = StructuredTool
 const FINISH_NAME = 'finish'
@@ -136,7 +137,7 @@ class AutoGPT_Agents implements INode {
                     // eslint-disable-next-line no-console
                     console.log('\x1b[92m\x1b[1m\n*****AutoGPT*****\n\x1b[0m\x1b[0m')
                     // eslint-disable-next-line no-console
-                    console.log(assistantReply)
+                    console.log(sanitizeInput(assistantReply))
                     totalAssistantReply += assistantReply + '\n'
                     executor.fullMessageHistory.push(new HumanMessage(user_input))
                     executor.fullMessageHistory.push(new AIMessage(assistantReply))

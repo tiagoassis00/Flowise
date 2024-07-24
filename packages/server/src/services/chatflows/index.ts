@@ -4,7 +4,7 @@ import { getRunningExpressApp } from '../../utils/getRunningExpressApp'
 import { ChatflowType, IChatFlow } from '../../Interface'
 import { ChatFlow } from '../../database/entities/ChatFlow'
 import { getAppVersion, getTelemetryFlowObj, isFlowValidForStream, constructGraphs, getEndingNodes } from '../../utils'
-import logger from '../../utils/logger'
+import logger, { sanitizeInput } from '../../utils/logger'
 import { removeFolderFromStorage } from 'flowise-components'
 import { IReactFlowObject } from '../../Interface'
 import { utilGetUploadsConfig } from '../../utils/getUploadsConfig'
@@ -93,7 +93,7 @@ const deleteChatflow = async (chatflowId: string): Promise<any> => {
             // Delete all upsert history
             await appServer.AppDataSource.getRepository(UpsertHistory).delete({ chatflowid: chatflowId })
         } catch (e) {
-            logger.error(`[server]: Error deleting file storage for chatflow ${chatflowId}: ${e}`)
+            logger.error(sanitizeInput(`[server]: Error deleting file storage for chatflow ${chatflowId}: ${e}`))
         }
         return dbResponse
     } catch (error) {

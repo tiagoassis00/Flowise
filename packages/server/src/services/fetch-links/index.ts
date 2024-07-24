@@ -2,6 +2,7 @@ import { webCrawl, xmlScrape } from 'flowise-components'
 import { StatusCodes } from 'http-status-codes'
 import { InternalFlowiseError } from '../../errors/internalFlowiseError'
 import { getErrorMessage } from '../../errors/utils'
+import { sanitizeInput } from '../../utils/logger'
 
 const getAllLinks = async (requestUrl: string, relativeLinksMethod: string, queryLimit: string): Promise<any> => {
     try {
@@ -13,9 +14,9 @@ const getAllLinks = async (requestUrl: string, relativeLinksMethod: string, quer
             )
         }
         const limit = parseInt(queryLimit)
-        if (process.env.DEBUG === 'true') console.info(`Start ${relativeLinksMethod}`)
+        if (process.env.DEBUG === 'true') console.info(sanitizeInput(`Start ${relativeLinksMethod}`))
         const links: string[] = relativeLinksMethod === 'webCrawl' ? await webCrawl(url, limit) : await xmlScrape(url, limit)
-        if (process.env.DEBUG === 'true') console.info(`Finish ${relativeLinksMethod}`)
+        if (process.env.DEBUG === 'true') console.info(sanitizeInput(`Finish ${relativeLinksMethod}`))
         const dbResponse = {
             status: 'OK',
             links

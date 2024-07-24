@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express'
 import { getRateLimiter } from '../../utils/rateLimit'
 import chatflowsService from '../../services/chatflows'
-import logger from '../../utils/logger'
+import logger, { sanitizeInput } from '../../utils/logger'
 import predictionsServices from '../../services/predictions'
 import { InternalFlowiseError } from '../../errors/internalFlowiseError'
 import { StatusCodes } from 'http-status-codes'
@@ -26,7 +26,7 @@ const createPrediction = async (req: Request, res: Response, next: NextFunction)
             throw new InternalFlowiseError(StatusCodes.NOT_FOUND, `Chatflow ${req.params.id} not found`)
         }
         let isDomainAllowed = true
-        logger.info(`[server]: Request originated from ${req.headers.origin}`)
+        logger.info(sanitizeInput(`[server]: Request originated from ${req.headers.origin}`))
         if (chatflow.chatbotConfig) {
             const parsedConfig = JSON.parse(chatflow.chatbotConfig)
             // check whether the first one is not empty. if it is empty that means the user set a value and then removed it.

@@ -93,14 +93,24 @@ export function expressRequestLogger(req: Request, res: Response, next: NextFunc
         }
 
         if (req.method !== 'GET') {
-            fileLogger.info(`${getRequestEmoji(req.method)} ${req.method} ${req.url}`)
-            logger.info(`${getRequestEmoji(req.method)} ${req.method} ${req.url}`)
+            const logMessage = sanitizeInput(`${getRequestEmoji(req.method)} ${req.method} ${req.url}`)
+            fileLogger.info(logMessage)
+            logger.info(logMessage)
         } else {
             fileLogger.http(`${getRequestEmoji(req.method)} ${req.method} ${req.url}`)
         }
     }
 
     next()
+}
+
+/**
+ * Sanitize the string received before it be saved as logging, storage,...
+ * @param {string} inputString
+ */
+export function sanitizeInput(inputString: string): string {
+    // Replace newline characters with their escaped equivalents
+    return inputString.replace(/[\r\n]/g, '')
 }
 
 export default logger

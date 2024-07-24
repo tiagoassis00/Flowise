@@ -339,18 +339,20 @@ async function crawl(baseURL: string, currentURL: string, pages: string[], limit
 
     pages.push(normalizeCurrentURL)
 
-    if (process.env.DEBUG === 'true') console.info(`actively crawling ${currentURL}`)
+    if (process.env.DEBUG === 'true') console.info(sanitizeInput(`actively crawling ${currentURL}`))
     try {
         const resp = await fetch(currentURL)
 
         if (resp.status > 399) {
-            if (process.env.DEBUG === 'true') console.error(`error in fetch with status code: ${resp.status}, on page: ${currentURL}`)
+            if (process.env.DEBUG === 'true')
+                console.error(sanitizeInput(`error in fetch with status code: ${resp.status}, on page: ${currentURL}`))
             return pages
         }
 
         const contentType: string | null = resp.headers.get('content-type')
         if ((contentType && !contentType.includes('text/html')) || !contentType) {
-            if (process.env.DEBUG === 'true') console.error(`non html response, content type: ${contentType}, on page: ${currentURL}`)
+            if (process.env.DEBUG === 'true')
+                console.error(sanitizeInput(`non html response, content type: ${contentType}, on page: ${currentURL}`))
             return pages
         }
 
@@ -360,7 +362,7 @@ async function crawl(baseURL: string, currentURL: string, pages: string[], limit
             pages = await crawl(baseURL, nextURL, pages, limit)
         }
     } catch (err) {
-        if (process.env.DEBUG === 'true') console.error(`error in fetch url: ${err.message}, on page: ${currentURL}`)
+        if (process.env.DEBUG === 'true') console.error(sanitizeInput(`error in fetch url: ${err.message}, on page: ${currentURL}`))
     }
     return pages
 }
@@ -393,25 +395,27 @@ export function getURLsFromXML(xmlBody: string, limit: number): string[] {
 
 export async function xmlScrape(currentURL: string, limit: number): Promise<string[]> {
     let urls: string[] = []
-    if (process.env.DEBUG === 'true') console.info(`actively scarping ${currentURL}`)
+    if (process.env.DEBUG === 'true') console.info(sanitizeInput(`actively scarping ${currentURL}`))
     try {
         const resp = await fetch(currentURL)
 
         if (resp.status > 399) {
-            if (process.env.DEBUG === 'true') console.error(`error in fetch with status code: ${resp.status}, on page: ${currentURL}`)
+            if (process.env.DEBUG === 'true')
+                console.error(sanitizeInput(`error in fetch with status code: ${resp.status}, on page: ${currentURL}`))
             return urls
         }
 
         const contentType: string | null = resp.headers.get('content-type')
         if ((contentType && !contentType.includes('application/xml') && !contentType.includes('text/xml')) || !contentType) {
-            if (process.env.DEBUG === 'true') console.error(`non xml response, content type: ${contentType}, on page: ${currentURL}`)
+            if (process.env.DEBUG === 'true')
+                console.error(sanitizeInput(`non xml response, content type: ${contentType}, on page: ${currentURL}`))
             return urls
         }
 
         const xmlBody = await resp.text()
         urls = getURLsFromXML(xmlBody, limit)
     } catch (err) {
-        if (process.env.DEBUG === 'true') console.error(`error in fetch url: ${err.message}, on page: ${currentURL}`)
+        if (process.env.DEBUG === 'true') console.error(sanitizeInput(`error in fetch url: ${err.message}, on page: ${currentURL}`))
     }
     return urls
 }
@@ -768,4 +772,13 @@ export const prepareSandboxVars = (variables: IVariable[]) => {
         }
     }
     return vars
+}
+
+/**
+ * Sanitize the string received before it be saved as logging, storage,...
+ * @param {string} inputString
+ */
+export function sanitizeInput(inputString: string): string {
+    // Replace newline characters with their escaped equivalents
+    return inputString.replace(/[\r\n]/g, '')
 }

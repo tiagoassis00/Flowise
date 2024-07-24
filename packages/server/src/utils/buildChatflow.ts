@@ -39,7 +39,7 @@ import { databaseEntities } from '.'
 import { v4 as uuidv4 } from 'uuid'
 import { omit } from 'lodash'
 import * as fs from 'fs'
-import logger from './logger'
+import logger, { sanitizeInput } from './logger'
 import { utilAddChatMessage } from './addChatMesage'
 import { buildAgentGraph } from './buildAgentGraph'
 import { getErrorMessage } from '../errors/utils'
@@ -209,9 +209,8 @@ export const utilBuildChatflow = async (req: Request, socketIO?: Server, isInter
         if (isFlowReusable()) {
             nodeToExecuteData = appServer.chatflowPool.activeChatflows[chatflowid].endingNodeData as INodeData
             isStreamValid = isFlowValidForStream(nodes, nodeToExecuteData)
-            logger.debug(
-                `[server]: Reuse existing chatflow ${chatflowid} with ending node ${nodeToExecuteData.label} (${nodeToExecuteData.id})`
-            )
+            const logMessage = `[server]: Reuse existing chatflow ${chatflowid} with ending node ${nodeToExecuteData.label} (${nodeToExecuteData.id})`
+            logger.debug(sanitizeInput(logMessage))
         } else {
             const isCustomFunctionEndingNode = endingNodes.some((node) => node.data?.outputs?.output === 'EndingNode')
 
@@ -280,7 +279,8 @@ export const utilBuildChatflow = async (req: Request, socketIO?: Server, isInter
 
             const startingNodes = nodes.filter((nd) => startingNodeIds.includes(nd.id))
 
-            logger.debug(`[server]: Start building chatflow ${chatflowid}`)
+            const logMessage = `[server]: Start building chatflow ${chatflowid}`
+            logger.debug(sanitizeInput(logMessage))
             /*** BFS to traverse from Starting Nodes to Ending Node ***/
             const reactFlowNodes = await buildFlow(
                 startingNodeIds,

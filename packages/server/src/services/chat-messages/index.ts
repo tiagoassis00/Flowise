@@ -6,7 +6,7 @@ import { utilAddChatMessage } from '../../utils/addChatMesage'
 import { getRunningExpressApp } from '../../utils/getRunningExpressApp'
 import { ChatMessageFeedback } from '../../database/entities/ChatMessageFeedback'
 import { removeFilesFromStorage } from 'flowise-components'
-import logger from '../../utils/logger'
+import logger, { sanitizeInput } from '../../utils/logger'
 import { ChatMessage } from '../../database/entities/ChatMessage'
 import { InternalFlowiseError } from '../../errors/internalFlowiseError'
 import { getErrorMessage } from '../../errors/utils'
@@ -111,7 +111,7 @@ const removeAllChatMessages = async (
             try {
                 await removeFilesFromStorage(chatflowid, chatId)
             } catch (e) {
-                logger.error(`[server]: Error deleting file storage for chatflow ${chatflowid}, chatId ${chatId}: ${e}`)
+                logger.error(sanitizeInput(`[server]: Error deleting file storage for chatflow ${chatflowid}, chatId ${chatId}: ${e}`))
             }
         }
         const dbResponse = await appServer.AppDataSource.getRepository(ChatMessage).delete(deleteOptions)
@@ -135,7 +135,7 @@ const abortChatMessage = async (chatId: string, chatflowid: string) => {
                 endingNodeData.signal.abort()
                 await appServer.chatflowPool.remove(`${chatflowid}_${chatId}`)
             } catch (e) {
-                logger.error(`[server]: Error aborting chat message for ${chatflowid}, chatId ${chatId}: ${e}`)
+                logger.error(sanitizeInput(`[server]: Error aborting chat message for ${chatflowid}, chatId ${chatId}: ${e}`))
             }
         }
     } catch (error) {
